@@ -1,11 +1,13 @@
 package ru.megafon.logic;
 
+import scala.Serializable;
+
 import java.util.Date;
 
 /**
  * Created by Gevorg.Khachaturyan on 01.09.2016.
  */
-public class GPS_FILE {
+public class GPS_FILE  implements Serializable {
 
     String msisdn;
     String subs_id;

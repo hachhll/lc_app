@@ -3,13 +3,14 @@ package ru.megafon.logic;
 
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
+import scala.Serializable;
 
 import java.util.Date;
 
 /**
  * Created by Gevorg.Khachaturyan on 01.09.2016.
  */
-public class HUB_FILE {
+public class HUB_FILE  implements Serializable {
 
     String msisdn;
     String subs_id;
@@ -21,7 +22,7 @@ public class HUB_FILE {
     String pay_source;
     Integer storege_mode;
     String user_status;
-    Date last_pay;
+    String last_pay;
     String alyt_id;
     String ivideon_id;
 
@@ -105,11 +106,11 @@ public class HUB_FILE {
         this.user_status = user_status;
     }
 
-    public Date getLast_pay() {
+    public String getLast_pay() {
         return last_pay;
     }
 
-    public void setLast_pay(Date last_pay) {
+    public void setLast_pay(String last_pay) {
         this.last_pay = last_pay;
     }
 

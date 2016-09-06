@@ -63,8 +63,14 @@ public class LC_APP {
                             for (Field field : hub_file.getClass().getDeclaredFields()) {
                                 field.setAccessible(true);
                                 try {
+                                    if (field.getType()== Integer.class) {
+                                        field.set(hub_file, Integer.valueOf(parts[counter]));
+                                    } else
                                     field.set(hub_file, parts[counter]);
                                 } catch (ArrayIndexOutOfBoundsException e) {
+                                    if (field.getType()== Integer.class) {
+                                        field.set(hub_file, 0);
+                                    } else
                                     field.set(hub_file, "");
                                 }
                                 counter++;
@@ -73,21 +79,22 @@ public class LC_APP {
                         }
                     });
 
+            System.out.println("Start calculate");
             // Get count of unic msisdn with fiilter by status and tarif
-            Integer  unique_msisdn = (int) (long) hub_val.filter(new Function<HUB_FILE, Boolean>() {
+            JavaRDD<String> unique_msisdn = hub_val.filter(new Function<HUB_FILE, Boolean>() {
                 public Boolean call(HUB_FILE hub_file) throws Exception {
-                    return hub_file.getUser_status().equals("")&&hub_file.getTarif().equals("");
+                    return hub_file.getUser_status().equals(file_prop.getProperty("user_status"))&&hub_file.getTarif().equals(file_prop.getProperty("tarif"));
                 }
             }).map(new Function<HUB_FILE, String>() {
                        public String call(HUB_FILE hub_file) throws Exception {
                            return hub_file.getMsisdn();
                        }
-                   }).distinct().count();
+                   });
 
             // get filter by tarif
             Long sensors_msisdn = hub_val.filter(new Function<HUB_FILE, Boolean>() {
                 public Boolean call(HUB_FILE hub_file) throws Exception {
-                    return hub_file.getTarif().equals("");
+                    return hub_file.getTarif().equals(file_prop.getProperty("tarif"));
                 }
             }).map(new Function<HUB_FILE, Integer>() {
                     public Integer call(HUB_FILE hub_file) throws Exception {
@@ -97,7 +104,7 @@ public class LC_APP {
                 public Integer call(Integer a, Integer b) { return a + b; }
             })/hub_val.filter(new Function<HUB_FILE, Boolean>() {
                 public Boolean call(HUB_FILE hub_file) throws Exception {
-                    return hub_file.getTarif().equals("");
+                    return hub_file.getTarif().equals(file_prop.getProperty("tarif"));
                 }
             }).map(new Function<HUB_FILE, Object>() {
                 public String call(HUB_FILE hub_file) throws Exception {
@@ -105,15 +112,16 @@ public class LC_APP {
                 }
             }).distinct().count();
 
-            System.out.print("unique_msisdn: "+unique_msisdn);
-            System.out.println("; sensors_msisdn: "+sensors_msisdn);
+            System.out.println("Show result");
+            System.out.println("unique_msisdn: " + unique_msisdn.count());
+            System.out.println("sensors_msisdn: " + sensors_msisdn);
 
-            //schemaHUB = sqlContext.createDataFrame(hub_val, HUB_FILE.class);
-            //schemaHUB.saveAsParquetFile(file_prop.getProperty("put_folder_name"));
         }finally {
+            System.out.print("finally");
             if (sc != null) {
                 sc.close();
             }
         }
+        System.out.print("stop application");
     }
 }
